@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Categories on Bayesian Statistics and Functional Programming </title>
+    <link>https://jonnylaw.rocks/categories/</link>
+    <description>Recent content in Categories on Bayesian Statistics and Functional Programming </description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 27 Mar 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://jonnylaw.rocks/categories/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Bayesian</title>
+      <link>https://jonnylaw.rocks/categories/bayesian/</link>
+      <pubDate>Fri, 27 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/categories/bayesian/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>R</title>
+      <link>https://jonnylaw.rocks/categories/r/</link>
+      <pubDate>Fri, 27 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/categories/r/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>tidy-tuesday</title>
+      <link>https://jonnylaw.rocks/categories/tidy-tuesday/</link>
+      <pubDate>Tue, 17 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/categories/tidy-tuesday/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>scala</title>
+      <link>https://jonnylaw.rocks/categories/scala/</link>
+      <pubDate>Tue, 16 Apr 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/categories/scala/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Running</title>
+      <link>https://jonnylaw.rocks/categories/running/</link>
+      <pubDate>Mon, 25 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/categories/running/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>scala, streaming, akka</title>
+      <link>https://jonnylaw.rocks/categories/scala-streaming-akka/</link>
+      <pubDate>Tue, 21 Feb 2017 12:13:14 -0500</pubDate>
+      
+      <guid>https://jonnylaw.rocks/categories/scala-streaming-akka/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>

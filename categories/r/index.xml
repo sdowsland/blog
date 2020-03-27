@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>R on Bayesian Statistics and Functional Programming </title>
+    <link>https://jonnylaw.rocks/categories/r/</link>
+    <description>Recent content in R on Bayesian Statistics and Functional Programming </description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 27 Mar 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://jonnylaw.rocks/categories/r/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Bayesian Inference for an SIR Model</title>
+      <link>https://jonnylaw.rocks/blog/bayesian-inference-for-an-sir-model/</link>
+      <pubDate>Fri, 27 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/blog/bayesian-inference-for-an-sir-model/</guid>
+      <description>Johns Hopkins University have put together a repository containing confirmed cases of COVID19, deaths and recovered patients. Below we plot the confirmed cases, confirmed recovered and deaths.
+SIR Model The system of ordinary differential equations (ODE) for the Susceptible Infected Recovered (SIR) model is given by
+\[\begin{align} &amp;amp; \frac{dS}{dt} = - \frac{\beta I S}{N}, \\ &amp;amp; \frac{dI}{dt} = \frac{\beta I S}{N}- \gamma I, \\ &amp;amp; \frac{dR}{dt} = \gamma I,\\ &amp;amp; N = S + I + R.</description>
+    </item>
+    
+    <item>
+      <title>Building a classification model with tidymodels</title>
+      <link>https://jonnylaw.rocks/blog/building-a-classification-model-with-tidymodels/</link>
+      <pubDate>Thu, 26 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/blog/building-a-classification-model-with-tidymodels/</guid>
+      <description>This blog post aims to introduce the various R packages making up the tidymodels metapackage by classfying Iris flower species from the Iris dataset. The Iris dataset is so famous it has its own Wikipedia Page. It consists of measurements of sepal and petal lengths and widths and the corresponding species name. A traditional machine learning task is to idetify the species from the other measurements.
+The current workflow for a typical classification (or regression) model in tidymodels is:</description>
+    </item>
+    
+    <item>
+      <title>Tidy Tuesday: The Office</title>
+      <link>https://jonnylaw.rocks/blog/tidy-tuesday-the-office/</link>
+      <pubDate>Tue, 17 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/blog/tidy-tuesday-the-office/</guid>
+      <description>First we download the ratings for each office episode using the tidytuesdayR package.
+office &amp;lt;- tidytuesdayR::tt_load(x = 2020, 12) episode_ratings &amp;lt;- office$office_ratings We can use glimpse from the tibble package to see the column types and some example data from the head of the table.
+glimpse(episode_ratings) ## Observations: 188 ## Variables: 6 ## $ season &amp;lt;dbl&amp;gt; 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, … ## $ episode &amp;lt;dbl&amp;gt; 1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, … ## $ title &amp;lt;chr&amp;gt; &amp;quot;Pilot&amp;quot;, &amp;quot;Diversity Day&amp;quot;, &amp;quot;Health Care&amp;quot;, &amp;quot;The Alliance&amp;quot;, … ## $ imdb_rating &amp;lt;dbl&amp;gt; 7.</description>
+    </item>
+    
+    <item>
+      <title>Tidy Tuesday: US Tuition Data</title>
+      <link>https://jonnylaw.rocks/blog/tidy-tuesday-us-tuition-data/</link>
+      <pubDate>Tue, 10 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/blog/tidy-tuesday-us-tuition-data/</guid>
+      <description>tuesdata &amp;lt;- tidytuesdayR::tt_load(2020, week = 11) This weeks data consists of tuition costs, salary potential and diversity information of US colleges. This includes 2 year colleges which offer associate degrees, certificates and diplomas and 4 year colleges which offer bachelors and masters degrees. These are further split by private institutions, public and for profit. Additionally, Universities in the US charge different tuition fees for in-state or out-of-state students. Also, the ticket price is not always reflective of the students costs.</description>
+    </item>
+    
+    <item>
+      <title>Releasing Harrier League Data</title>
+      <link>https://jonnylaw.rocks/blog/harrier_league_open_data/</link>
+      <pubDate>Wed, 04 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/blog/harrier_league_open_data/</guid>
+      <description>The North East Harrier League is a series of cross country running races in the North East of England taking place over the winter from September to March. Results are available online from 2012-13 season to the present season 2019-20. The results are available online in HTML format. I have downloaded and cleaned the data and it can be used for analysis or exploration. The data for senior men and women is available in a tabular format in my blog package - see the file which contains the parsing functions here to get an insight into what it takes to parse this kind of data.</description>
+    </item>
+    
+    <item>
+      <title>Analysing .fit files in R</title>
+      <link>https://jonnylaw.rocks/blog/analysing-fit-files-in-r/</link>
+      <pubDate>Mon, 04 Nov 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/blog/analysing-fit-files-in-r/</guid>
+      <description>Garmin running watches output a file type called .fit, the developer SDK can be downloaded from the ANT website. There is also Python library named fitparse which has been written to parse .fit files. This blog post will show you how to use reticulate to parse a .fit file.
+First create a Python virtual environment, this is commonly used to store a projects’ package collection together to enable more straightforward reproducibility.</description>
+    </item>
+    
+    <item>
+      <title>Bayesian Survival Analysis: Exponential Model</title>
+      <link>https://jonnylaw.rocks/blog/bayesian-survival-analysis/</link>
+      <pubDate>Fri, 09 Aug 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/blog/bayesian-survival-analysis/</guid>
+      <description>Poisson Distribution Consider an arbitrary interval where the expected number of events in the interval is denoted as \(\lambda\). The number of events in this interval is Poisson distributed with rate \(\lambda\). To see this, proceed to subdivide the interval into \(n\) smaller intervals \(t_1, \dots, t_n\) in which the probability of an event occurring in each small interval is \(\lambda / n\) and can be represented as an independent Bernoulli trial.</description>
+    </item>
+    
+    <item>
+      <title>Forward Mode AD in R</title>
+      <link>https://jonnylaw.rocks/blog/forward-mode-automatic-differentiation-r/</link>
+      <pubDate>Mon, 05 Aug 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/blog/forward-mode-automatic-differentiation-r/</guid>
+      <description>Forward Mode Automatic Differentation Automatic differentiation can be used to calculate the exact derivative of a function at a point using applications of the chain rule. Dual numbers provide a straightforward implementation in R using S3 generic methods. A dual number has a real component and a “dual” component which can be used to exacly calculate the expression and derivative at a specific value of \(x\). Consider the quadratic form \(f(x) = 5x^2 + 3x + 10\) with derivative \(f^\prime(x) = 10x + 3\).</description>
+    </item>
+    
+    <item>
+      <title>Hamiltonian Monte Carlo in R</title>
+      <link>https://jonnylaw.rocks/blog/hamiltonian_monte_carlo_in_r/</link>
+      <pubDate>Wed, 31 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/blog/hamiltonian_monte_carlo_in_r/</guid>
+      <description>Introduction Determining the posterior distribution for the parameters of a real-world Bayesian model inevitably requires calculating high-dimensional integrals. Often these are tedious or impossible to calculate by hand. Markov chain Monte Carlo (MCMC) algorithms are popular approaches, samplers such as the Gibbs sampler can be used to sample from models with conditionally conjugate specifications and the Metropolis-Hastings algorithm can be used when the conditionally conjugate form is not present.</description>
+    </item>
+    
+    <item>
+      <title>Bayesian Linear Regression with Gibbs Sampling in R</title>
+      <link>https://jonnylaw.rocks/blog/bayesian-linear-regression-gibbs/</link>
+      <pubDate>Fri, 14 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/blog/bayesian-linear-regression-gibbs/</guid>
+      <description>Linear regression models are commonly used to explain relationships between predictor variables and outcome variables. The data consists of pairs of independent observations \((y_i, x_i)\) where \(y_i \in \mathbb{R}^p\) represents the outcome variable of the \(i^{th}\) observation and \(x_i \in \mathbb{R}^{m \times 1}\) represents the predictor variable of the \(i^{th}\) observation. The specification for this model is:
+\[y_i = \beta^T x_i + \varepsilon_i, \quad \varepsilon_i \sim \mathcal{N}(0, \Sigma).\]
+The parameters of the model include the coefficients of the predictor variables, \(\beta \in \mathbb{R}^{1 \times m}\) and the variance of the unmodelled noise, \(\Sigma \in \mathbb{R}^{p \times p}\).</description>
+    </item>
+    
+    <item>
+      <title>Bayesian Inference using rejection sampling</title>
+      <link>https://jonnylaw.rocks/blog/rejection-sampling/</link>
+      <pubDate>Mon, 25 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/blog/rejection-sampling/</guid>
+      <description>Coin Flip Model As an example, consider a (possibly biased) coin flip experiment. The parameter of interest is the probability of heads \(p_h\). A Beta distribution is chosen for the prior of \(p_h\), \(p(p_h) = \mathcal{B}(\alpha, \beta)\). The Beta distribution has support between 0 and 1, which is appropriate for a probability. The likelihood of a coin flip is Bernoulli, however the coin should be flipped several times in order to learn the parameter \(p_h\).</description>
+    </item>
+    
+    <item>
+      <title>Sampling from a distribution with a known CDF</title>
+      <link>https://jonnylaw.rocks/blog/inverse-sampling/</link>
+      <pubDate>Mon, 25 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/blog/inverse-sampling/</guid>
+      <description>A distribution with an inverse cumulative distribution function (CDF) can be sampled from using just samples from \(U[0, 1]\). The inverse CDF (sometimes called the quantile function) is the value of \(x\) such that \(F_X(x) = Pr(X \leq x) = p\). Consider a that a transformation \(g: [0, 1] \rightarrow \mathbb{R}\), exists which takes a value sampled from the standard uniform distribution \(u \sim U[0, 1]\) and returns a value distributed according to the target distribution.</description>
+    </item>
+    
+    <item>
+      <title>A Statistical Model for Finishing Positions at the National Cross Country</title>
+      <link>https://jonnylaw.rocks/blog/national-cross-country/</link>
+      <pubDate>Fri, 22 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/blog/national-cross-country/</guid>
+      <description>Area Results Download the results from Power of ten for northern, midlands, southern and national.
+ A linear model The goal is to fit a model, where the outcome is the position at the national and the input is the position at the northern XC. This then allows us to determine the quality of the field at each XC and determine what position you are likely to finish in the National this season given a result in the area championships.</description>
+    </item>
+    
+    <item>
+      <title>Efficient Markov Chain Monte Carlo in R with Rcpp</title>
+      <link>https://jonnylaw.rocks/blog/efficient_mcmc_using_rcpp/</link>
+      <pubDate>Mon, 11 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/blog/efficient_mcmc_using_rcpp/</guid>
+      <description>Bivariate Normal Model This post considers how to implement a simple Metropolis scheme to determine the parameter posterior distribution of a bivariate Normal distribution. The implementation is generic, using higher-order-functions and hence can be re-used with new algorithms by specifying the un-normalised log-posterior density and a proposal distribution for the parameters. The built-in parallel package is used fit multiple chains in parallel, finally the Metropolis algorithm is reimplemented in C++ using Rcpp which seemlessly integrates with R.</description>
+    </item>
+    
+    <item>
+      <title>Harrier League Cross Country</title>
+      <link>https://jonnylaw.rocks/blog/harrier-league-cross-country/</link>
+      <pubDate>Thu, 26 Oct 2017 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/blog/harrier-league-cross-country/</guid>
+      <description>The Harrier League is a cross country running league with seven fixtures across the North East of England in the 2017/18 season across the winter months from September ’17 until March ‘18.
+The Harrier League is unique to other cross country fixtures because the senior runners are divided up into slow, medium and fast packs. In the senior men’s race, the slow runners start first followed 2 minutes 30 seconds later by the medium pack runners, then a further 2 minutes 30 seconds by the fast pack runners.</description>
+    </item>
+    
+  </channel>
+</rss>

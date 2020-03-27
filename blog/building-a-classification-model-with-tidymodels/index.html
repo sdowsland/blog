@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.68.3" />
+
+
+<title>Building a classification model with tidymodels - Bayesian Statistics and Functional Programming </title>
+<meta property="og:title" content="Building a classification model with tidymodels - Bayesian Statistics and Functional Programming ">
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdn.bootcss.com/highlight.js/9.11.0/styles/tomorrow-night-eighties.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/picture_cropped.jpg"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/about/">About</a></li>
+    
+    <li><a href="/blog/">Blog</a></li>
+    
+    <li><a href="https://github.com/jonnylaw">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/lawsy">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    <h1 class="article-title">Building a classification model with tidymodels</h1>
+
+    
+
+    <div class="article-content">
+      
+
+
+<p>This blog post aims to introduce the various <code>R</code> packages making up the <a href="https://github.com/tidymodels/tidymodels">tidymodels</a> metapackage by classfying Iris flower species from the Iris dataset. The Iris dataset is so famous it has its own <a href="https://en.wikipedia.org/wiki/Iris_flower_data_set">Wikipedia Page</a>. It consists of measurements of sepal and petal lengths and widths and the corresponding species name. A traditional machine learning task is to idetify the species from the other measurements.</p>
+<p>The current workflow for a typical classification (or regression) model in tidymodels is:</p>
+<ul>
+<li>Split the data into training and test sets</li>
+<li>Define pre-processing steps using <a href="https://tidymodels.github.io/recipes/">recipes</a></li>
+<li>Create a model using <a href="https://tidymodels.github.io/parsnip/">parsnip</a></li>
+<li>Combine the model and recipe into a <a href="https://tidymodels.github.io/workflows/">workflow</a></li>
+<li>Perform hyper-parameter tuning using cross validation on the training data using <a href="https://tidymodels.github.io/tune/">tune</a></li>
+<li>Select the hyper-parameters which minimise (or maximise) a selected metric using cross validation on the training data</li>
+<li>Fit the selected model to the training data</li>
+<li>Evaluate the model on the test set</li>
+</ul>
+<p>It is worth noting that tidymodels is in active development and hence the user facing API is not stable.</p>
+<p>To begin, we load in the Iris data. The data is available in the <code>datasets</code> <code>R</code> package which comes with a base installation of <code>R</code> and so can be loaded using the <code>data</code> function.</p>
+<pre class="r"><code>data(iris)</code></pre>
+<p>Typically we would explore the data before beginning modelling. We can produce a plot of the Iris data.</p>
+<pre class="r"><code>iris %&gt;% 
+  ggplot(aes(x = Sepal.Length, y = Sepal.Width, colour = Species)) +
+  geom_point()</code></pre>
+<p><img src="/blog/building-a-classification-model-with-tidymodels_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>Now, split the iris data into training and test sets. We use <code>initial_split</code> to perform stratifed sampling using the outcome variable <code>Species</code>. This ensures we have examples of each class in our test set and training set. <code>prop</code> is set to 4/5 meaning that we keep approximately 80% (= 4/5) of the data for training and 20% of the data in the testing set. The purpose of splitting the data into training and testing sets is to avoid overfitting and let us understand how our chosen model will perform on new, unseen data. For that reason the test set is not used in selecting the model or model hyper-parameter tuning.</p>
+<pre class="r"><code>set.seed(1) # Set a seed to get reproducible splits
+split &lt;- rsample::initial_split(iris, strata = Species, prop = 4/5)
+train &lt;- rsample::training(split)
+test &lt;- rsample::testing(split)</code></pre>
+<p>Next a recipe us used to pre-process the data. In the Iris dataset there is no missing data, however we could specify imputation techniques here or choose to omit examples with missing values. We decide to centre and scale the predictors. This will help when fitting a regression model since all the predictors will be on the same scale resulting in a stable design matrix.</p>
+<pre class="r"><code>rec &lt;- recipe(Species ~ ., data = train) %&gt;% 
+  step_center(all_predictors()) %&gt;% 
+  step_scale(all_predictors())</code></pre>
+<p>Next we specify a multinomial regression model using the engine <a href="https://cran.r-project.org/web/packages/glmnet/index.html">glmnet</a>. <code>glmnet</code> is an <code>R</code> package for fitting generalised linear models using an elastic net penalty. The elastic net penalty is a combination of lasso, or L1 regularization (for feature selection) and ridge, or L2 regularization (for coefficient shrinking). We leave the penalty and mixture arguments unspecified and instead using the function <code>tune()</code>. This means we can learn these hyper-parameters by minimising a performance metric (such as accuracy) using <span class="math inline">\(k\)</span>-fold cross validation on the training set.</p>
+<pre class="r"><code>model &lt;- multinom_reg() %&gt;% 
+  set_engine(&quot;glmnet&quot;) %&gt;% 
+  set_args(penalty = tune(), mixture = tune())</code></pre>
+<p>The recipe and model can be combined together into a workflow.</p>
+<pre class="r"><code>wf &lt;- workflow() %&gt;% 
+  add_recipe(rec) %&gt;% 
+  add_model(model)</code></pre>
+<p>Next, create a <span class="math inline">\(k\)</span>-fold cross validation dataset using training data. This creates 10 random splits of the data which can be used to perform hyper-parameter optimisation.</p>
+<pre class="r"><code>cv &lt;- rsample::vfold_cv(train, strata = Species, v = 10)</code></pre>
+<p>Use grid search to find some good hyper-parameters. This evaluates different values of <code>penalty</code> and <code>mixture</code> for each of the folds and records the ROC-AUC and accuracy metrics for each model. Grid search becomes inefficient when then number of hyper-parameters becomes large and more sophisticated optimisation algorithms can be used.</p>
+<pre class="r"><code>hyper_parameters &lt;- tune::tune_grid(wf, resamples = cv)</code></pre>
+<p>We can view the metrics for a selection of the hyper-parameters.</p>
+<pre class="r"><code>collect_metrics(hyper_parameters)</code></pre>
+<pre><code>## # A tibble: 20 x 7
+##     penalty mixture .metric  .estimator  mean     n std_err
+##       &lt;dbl&gt;   &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;      &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;
+##  1 1.83e-10  0.983  accuracy multiclass 0.968    10 0.0130 
+##  2 1.83e-10  0.983  roc_auc  hand_till  0.998    10 0.00160
+##  3 2.08e- 9  0.690  accuracy multiclass 0.96     10 0.0183 
+##  4 2.08e- 9  0.690  roc_auc  hand_till  1        10 0      
+##  5 6.33e- 8  0.524  accuracy multiclass 0.96     10 0.0183 
+##  6 6.33e- 8  0.524  roc_auc  hand_till  1        10 0      
+##  7 7.92e- 7  0.811  accuracy multiclass 0.977    10 0.0120 
+##  8 7.92e- 7  0.811  roc_auc  hand_till  1        10 0      
+##  9 1.11e- 6  0.113  accuracy multiclass 0.975    10 0.0178 
+## 10 1.11e- 6  0.113  roc_auc  hand_till  1        10 0      
+## 11 9.56e- 5  0.207  accuracy multiclass 0.975    10 0.0178 
+## 12 9.56e- 5  0.207  roc_auc  hand_till  1        10 0      
+## 13 1.95e- 4  0.493  accuracy multiclass 0.975    10 0.0178 
+## 14 1.95e- 4  0.493  roc_auc  hand_till  1        10 0      
+## 15 1.44e- 3  0.0155 accuracy multiclass 0.975    10 0.0178 
+## 16 1.44e- 3  0.0155 roc_auc  hand_till  1        10 0      
+## 17 1.42e- 2  0.790  accuracy multiclass 0.96     10 0.0183 
+## 18 1.42e- 2  0.790  roc_auc  hand_till  1        10 0      
+## 19 4.02e- 1  0.358  accuracy multiclass 0.855    10 0.0334 
+## 20 4.02e- 1  0.358  roc_auc  hand_till  0.961    10 0.0144</code></pre>
+<p>Select the best hyper-parameters, then fit the model using these parameters.</p>
+<pre class="r"><code>best_hp &lt;- select_best(hyper_parameters, metric = &quot;roc_auc&quot;)
+best_model &lt;- model %&gt;% 
+  set_args(penalty = best_hp$penalty, trees = best_hp$mixture)
+fitted_model &lt;- fit(best_model, Species ~ ., data = juice(prep(rec, train)))</code></pre>
+<pre><code>## Warning in glmnet::glmnet(x = as.matrix(x), y = y, alpha = ~tune(), trees =
+## ~best_hp$mixture, : alpha &gt;1; set to 1</code></pre>
+<p>We can now determine the performance of the algorithm using a selection of metrics. We choose accuracy, precision and f1-measure.</p>
+<pre class="r"><code>predicted &lt;- predict(fitted_model, new_data = bake(prep(rec, train), test))
+metrics &lt;- metric_set(accuracy, precision, f_meas)
+metrics(data = bind_cols(predicted, test), truth = Species, estimate = .pred_class)</code></pre>
+<pre><code>## # A tibble: 3 x 3
+##   .metric   .estimator .estimate
+##   &lt;chr&gt;     &lt;chr&gt;          &lt;dbl&gt;
+## 1 accuracy  multiclass     0.963
+## 2 precision macro          0.967
+## 3 f_meas    macro          0.963</code></pre>
+<p>This test set performance is indicative of what we can expect on unseen iris examples.</p>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/highlight.min.js"></script>
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/r.min.js"></script>
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/yaml.min.js"></script>
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/scala.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="/js/math-code.js"></script>
+<script async src="//cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+

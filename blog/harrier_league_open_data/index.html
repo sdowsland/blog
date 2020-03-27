@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.68.3" />
+
+
+<title>Releasing Harrier League Data - Bayesian Statistics and Functional Programming </title>
+<meta property="og:title" content="Releasing Harrier League Data - Bayesian Statistics and Functional Programming ">
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdn.bootcss.com/highlight.js/9.11.0/styles/tomorrow-night-eighties.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/picture_cropped.jpg"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/about/">About</a></li>
+    
+    <li><a href="/blog/">Blog</a></li>
+    
+    <li><a href="https://github.com/jonnylaw">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/lawsy">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    <h1 class="article-title">Releasing Harrier League Data</h1>
+
+    
+
+    <div class="article-content">
+      
+
+
+<p>The North East Harrier League is a series of cross country running races in the North East of England taking place over the winter from September to March. Results are available online from 2012-13 season to the present season 2019-20. The results are available online in HTML format. I have downloaded and cleaned the data and it can be used for analysis or exploration. The data for senior men and women is available in a tabular format in my blog package - see the file which contains the parsing functions <a href="https://github.com/jonnylaw/jonnylaw/blob/master/R/harrier_league.R">here</a> to get an insight into what it takes to parse this kind of data.</p>
+<p>I used the following R packages to download, parse the HTML and clean the resulting data</p>
+<ul>
+<li><a href="https://rvest.tidyverse.org/">rvest</a> is a web scraping library for R. The functions <code>read_html</code>, <code>html_table</code> were used to download the raw html and extract tables created using <code>&lt;table&gt;</code> tags. <code>html_node</code> can be used to find a specific tag, for instance the date of a fixture was often in a main header denoted by either <code>&lt;h1&gt;</code> or <code>&lt;h2&gt;</code>.</li>
+<li><a href="https://dplyr.tidyverse.org/">dplyr</a> provides a suite of functions which can be used to manipulate columns of a dataframe in a declarative, functional way.</li>
+<li><a href="https://stringr.tidyverse.org/">stringr</a> was used to parse strings in the raw data and the HTML. Information such as division is included in the same table cell as the name. This can be extracted using <code>str_extract(name, pattern = &quot;[1-3]&quot;)</code> the regex matches either 1, 2 or 3 and extracts the matching number.</li>
+</ul>
+<p>The data can be accessed by installing my R package which contains a selection of R code relating to this blog.</p>
+<pre class="r"><code># install.packages(&quot;remotes&quot;)
+# remotes::install_github(&quot;jonnylaw/jonnylaw&quot;)
+data(&quot;harrier_league_results&quot;)</code></pre>
+<div id="determining-the-most-difficult-course" class="section level2">
+<h2>Determining the most difficult course</h2>
+<p>As a quick example of what can be done with the data I will consider the running time by course. The data can be split by male and female. However the men and women don’t compete over the same distance with the women completing two laps and the men completing three. Therefore we can plot the average time for a single lap of the course (obviously this doesn’t account for changing pace throughout the race). It appears that the hardest (or longest) course is Aykley Heads with the highest median race time.</p>
+<p><img src="/blog/harrier_league_data_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+</div>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/highlight.min.js"></script>
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/r.min.js"></script>
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/yaml.min.js"></script>
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/scala.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+
+    
+  </body>
+</html>
+

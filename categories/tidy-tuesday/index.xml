@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>tidy-tuesday on Bayesian Statistics and Functional Programming </title>
+    <link>https://jonnylaw.rocks/categories/tidy-tuesday/</link>
+    <description>Recent content in tidy-tuesday on Bayesian Statistics and Functional Programming </description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 17 Mar 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://jonnylaw.rocks/categories/tidy-tuesday/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Tidy Tuesday: The Office</title>
+      <link>https://jonnylaw.rocks/blog/tidy-tuesday-the-office/</link>
+      <pubDate>Tue, 17 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/blog/tidy-tuesday-the-office/</guid>
+      <description>First we download the ratings for each office episode using the tidytuesdayR package.
+office &amp;lt;- tidytuesdayR::tt_load(x = 2020, 12) episode_ratings &amp;lt;- office$office_ratings We can use glimpse from the tibble package to see the column types and some example data from the head of the table.
+glimpse(episode_ratings) ## Observations: 188 ## Variables: 6 ## $ season &amp;lt;dbl&amp;gt; 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, … ## $ episode &amp;lt;dbl&amp;gt; 1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, … ## $ title &amp;lt;chr&amp;gt; &amp;quot;Pilot&amp;quot;, &amp;quot;Diversity Day&amp;quot;, &amp;quot;Health Care&amp;quot;, &amp;quot;The Alliance&amp;quot;, … ## $ imdb_rating &amp;lt;dbl&amp;gt; 7.</description>
+    </item>
+    
+    <item>
+      <title>Tidy Tuesday: US Tuition Data</title>
+      <link>https://jonnylaw.rocks/blog/tidy-tuesday-us-tuition-data/</link>
+      <pubDate>Tue, 10 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/blog/tidy-tuesday-us-tuition-data/</guid>
+      <description>tuesdata &amp;lt;- tidytuesdayR::tt_load(2020, week = 11) This weeks data consists of tuition costs, salary potential and diversity information of US colleges. This includes 2 year colleges which offer associate degrees, certificates and diplomas and 4 year colleges which offer bachelors and masters degrees. These are further split by private institutions, public and for profit. Additionally, Universities in the US charge different tuition fees for in-state or out-of-state students. Also, the ticket price is not always reflective of the students costs.</description>
+    </item>
+    
+  </channel>
+</rss>

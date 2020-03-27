@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.68.3" />
+
+
+<title>Tidy Tuesday: NHL Goalscorers - Bayesian Statistics and Functional Programming </title>
+<meta property="og:title" content="Tidy Tuesday: NHL Goalscorers - Bayesian Statistics and Functional Programming ">
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdn.bootcss.com/highlight.js/9.11.0/styles/tomorrow-night-eighties.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/picture_cropped.jpg"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/about/">About</a></li>
+    
+    <li><a href="/blog/">Blog</a></li>
+    
+    <li><a href="https://github.com/jonnylaw">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/lawsy">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    <h1 class="article-title">Tidy Tuesday: NHL Goalscorers</h1>
+
+    
+
+    <div class="article-content">
+      
+
+
+<p>First install the Tidy Tuesday R package.</p>
+<pre class="r"><code># install.packages(&quot;remotes&quot;)
+remotes::install_github(&quot;thebioengineer/tidytuesdayR&quot;)</code></pre>
+<p>The data for this Tuesday can be downloaded using <code>tt_load</code>.</p>
+<pre class="r"><code>tuesdata &lt;- tidytuesdayR::tt_load(&#39;2020-03-03&#39;)</code></pre>
+<p>Unfortunately this only grabbed one file - the top 250 goalscorers. First look at this file.</p>
+<div id="top-career-goalscorers" class="section level1">
+<h1>Top Career Goalscorers</h1>
+<pre class="r"><code>tuesdata$top_250 %&gt;% 
+  top_n(30, wt = total_goals) %&gt;% 
+  mutate(player = forcats::fct_reorder(player, total_goals)) %&gt;% 
+  ggplot(aes(x = player, y = total_goals)) +
+  geom_col() +
+  coord_flip() </code></pre>
+<p><img src="/blog/tidy_tuesday_nhl_data_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+</div>
+<div id="average-goals-per-season" class="section level1">
+<h1>Average goals per season</h1>
+<pre class="r"><code>parse_end_year &lt;- function(years) {
+  end_tens &lt;- substr(years, 6, 7)
+  possible_end &lt;- as.numeric(paste0(substr(years, 1, 2), end_tens))
+  start &lt;- as.numeric(substr(years, 1, 4))
+  if (possible_end - start &gt; 0) {
+    possible_end
+  } else {
+    as.numeric(paste0(20, end_tens))
+  }
+}
+
+options(scipen = 99)
+tuesdata$top_250 %&gt;%
+  rowwise() %&gt;% 
+  mutate(
+    yr_end = parse_end_year(years),
+    seasons = yr_end - yr_start,
+    average_goals_per_season = total_goals / seasons,
+    decade = cut(yr_start, breaks = seq(1920, 2020, by = 10), dig.lab = 10)
+  ) %&gt;% 
+  ungroup() %&gt;% 
+  # group_by(decade) %&gt;% 
+  mutate(player = forcats::fct_reorder(player, average_goals_per_season)) %&gt;% 
+  top_n(30, wt = average_goals_per_season) %&gt;%
+  ggplot(aes(x = player, y = average_goals_per_season, fill = active)) +
+  geom_col() +
+  coord_flip()</code></pre>
+<p><img src="/blog/tidy_tuesday_nhl_data_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>  # facet_wrap( ~ decade, scales = &quot;free_y&quot;)</code></pre>
+<pre class="r"><code>goals_per_season &lt;- tuesdata$top_250 %&gt;%
+  rowwise() %&gt;%
+  mutate(
+    yr_end = parse_end_year(years),
+    seasons = yr_end - yr_start,
+    average_goals_per_season = total_goals / seasons,
+    decade = cut(
+      yr_start,
+      breaks = seq(1920, 2020, by = 10),
+      dig.lab = 10
+    )
+  ) %&gt;%
+  ungroup()
+
+ggplot() +
+  geom_point(data = goals_per_season,
+             aes(x = seasons, y = average_goals_per_season)) +
+  ggrepel::geom_label_repel(data = top_n(goals_per_season, 10, total_goals), aes(x = seasons, y = average_goals_per_season, label = paste(player, total_goals), fill = active)) +
+  xlab(&quot;Total Seasons in NHL&quot;) +
+  ylab(&quot;Average Goals per Season&quot;) +
+  theme_minimal() +
+  labs(title = tools::toTitleCase(&quot;average goals per season and total number of seasons \nfor the top 250 NHL Goal Scorers&quot;), subtitle = &quot;Top 10 all-time goal scorers are labelled&quot;) +
+  theme(legend.position = c(0.9, 0.9), legend.title = element_blank())</code></pre>
+<p><img src="/blog/tidy_tuesday_nhl_data_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<pre class="r"><code># ggsave(&quot;goals_per_season.png&quot;)</code></pre>
+</div>
+<div id="game-goals" class="section level1">
+<h1>Game Goals</h1>
+<pre class="r"><code>game_goals &lt;- readr::read_csv(&#39;https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-03-03/game_goals.csv&#39;)</code></pre>
+<pre class="r"><code>highlighted_players &lt;- tuesdata$top_250 %&gt;% 
+  filter(player %in% c(&quot;Alex Ovechkin&quot;, &quot;Wayne Gretzky&quot;)) %&gt;% 
+  select(player, yr_start)
+
+cumulative_goals &lt;- game_goals %&gt;% 
+  mutate(age_years = as.numeric(substr(age, 1, 2))) %&gt;% 
+  group_by(player, age_years) %&gt;% 
+  summarise(goals_per_season = sum(goals)) %&gt;% 
+  arrange(player, age_years) %&gt;% 
+  inner_join(tuesdata$top_250, by = &quot;player&quot;) %&gt;% 
+  mutate(cumulative_goals = cumsum(goals_per_season))
+
+ggplot(cumulative_goals, aes(x = age_years, y = cumulative_goals)) +
+  geom_line(data = cumulative_goals,
+            aes(x = age_years, y = cumulative_goals, group = player),
+            alpha = 0.2) +
+  geom_line(
+    data = cumulative_goals %&gt;% inner_join(highlighted_players, by = &quot;player&quot;),
+    aes(x = age_years, y = cumulative_goals, colour = player)
+  ) +
+  geom_label_repel(
+    data =
+      cumulative_goals %&gt;%
+      inner_join(highlighted_players, by = &quot;player&quot;) %&gt;% 
+      filter(age_years == 30),
+    aes(
+      x = age_years,
+      y = cumulative_goals,
+      label = player,
+      colour = player
+    )
+  ) +
+  xlab(&quot;Player Age&quot;) +
+  ylab(&quot;Total Goals&quot;) +
+  theme_minimal() +
+  labs(title = &quot;Cumulative Goals in the NHL by Age&quot;, subtitle = &quot;Data from 42 of the all time 250 NHL scorers who started their career since game-level \ndata became available in 1979/80 season.&quot;) +
+  theme(legend.position = &quot;none&quot;)</code></pre>
+<p><img src="/blog/tidy_tuesday_nhl_data_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<pre class="r"><code># ggsave(&quot;cumulative_goals.png&quot;)</code></pre>
+<div id="post-some-results-to-twitter" class="section level2">
+<h2>Post some results to Twitter</h2>
+<p>Now use the <a href="https://cran.r-project.org/web/packages/twitteR/README.html">twitteR</a> library to post the plots directly to Twitter without leaving R. You must connect to the Twitter API using OAuth as described in the README for twitteR, I set the Twitter application keys in my <code>.Renviron</code> file which is never committed to public version control (this can be easily edited using <code>usethis::edit_r_environ()</code>).</p>
+<pre class="r"><code>library(twitteR)
+oauth &lt;- setup_twitter_oauth(
+  Sys.getenv(&quot;TWITTER_API_KEY&quot;),
+  Sys.getenv(&quot;TWITTER_API_SECRET_KEY&quot;),
+  access_token = Sys.getenv(&quot;TWITTER_ACCESS_TOKEN&quot;),
+  access_secret = Sys.getenv(&quot;TWITTER_ACCESS_TOKEN_SECRET&quot;)
+)</code></pre>
+<p>With twitteR we can get the most recent #tidytuesday posts</p>
+<pre class="r"><code>searchTwitter(&#39;#tidytuesday&#39;, n = 10)</code></pre>
+<p>Unfortunately the twitteR API (I think people tend to use <a href="https://rtweet.info">rtweet</a> now!) is a little outdated and requires tweets to be less than 140 characters (however this can be bypassed using <code>bypassCharLimit = TRUE</code>) and we can’t post multiple images in the same tweet using the <code>mediaPath</code> argument. So unfortunately I had to resort to posting my graphs manually!</p>
+<pre class="r"><code>updateStatus(
+  &quot;Can Alex Ovechkin overhaul Wayne Gretzky&#39;s all time NHL goal scoring record. It appears as if Wayne slowed down in the latter years of his career. #rstats #TidyTuesday&quot;,
+  mediaPath = c(&quot;cumulative_goals.png&quot;, &quot;goals_per_season.png&quot;),
+  bypassCharLimit = TRUE
+)</code></pre>
+</div>
+</div>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/highlight.min.js"></script>
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/r.min.js"></script>
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/yaml.min.js"></script>
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/scala.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="/js/math-code.js"></script>
+<script async src="//cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+

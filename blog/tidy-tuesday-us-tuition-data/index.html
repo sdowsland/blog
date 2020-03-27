@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.68.3" />
+
+
+<title>Tidy Tuesday: US Tuition Data - Bayesian Statistics and Functional Programming </title>
+<meta property="og:title" content="Tidy Tuesday: US Tuition Data - Bayesian Statistics and Functional Programming ">
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdn.bootcss.com/highlight.js/9.11.0/styles/tomorrow-night-eighties.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/picture_cropped.jpg"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/about/">About</a></li>
+    
+    <li><a href="/blog/">Blog</a></li>
+    
+    <li><a href="https://github.com/jonnylaw">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/lawsy">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    <h1 class="article-title">Tidy Tuesday: US Tuition Data</h1>
+
+    
+
+    <div class="article-content">
+      
+
+
+<pre class="r"><code>tuesdata &lt;- tidytuesdayR::tt_load(2020, week = 11)</code></pre>
+<p>This weeks data consists of tuition costs, salary potential and diversity information of US colleges. This includes 2 year colleges which offer associate degrees, certificates and diplomas and 4 year colleges which offer bachelors and masters degrees. These are further split by private institutions, public and for profit. Additionally, Universities in the US charge different tuition fees for in-state or out-of-state students. Also, the ticket price is not always reflective of the students costs. The fees can be wholly or partially subsidised by scholarships and financial aid.</p>
+<p>The first question which I wanted to answer is which universities have the highest tuition cost and what type of institution are they.</p>
+<pre class="r"><code>tuition_cost &lt;- tuesdata$tuition_cost
+
+tuition_cost %&gt;% 
+  top_n(30, wt = in_state_tuition) %&gt;%
+  mutate(name = forcats::fct_reorder(name, in_state_tuition)) %&gt;%
+  ggplot(aes(x = name, y = in_state_tuition, fill = type)) +
+  geom_col() +
+  coord_flip() +
+  scale_y_continuous(labels = scales::dollar_format()) +
+  labs(title = &quot;Top 30 most expensive colleges&quot;) +
+  ylab(&quot;College&quot;) +
+  xlab(&quot;In State Tuition&quot;)</code></pre>
+<p><img src="/blog/tidy-tuesday-us-tuition-data_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p><a href="https://github.com/mjskay/tidybayes">tidybayes</a> can be used to plot the distribution of in state costs and out of state costs.</p>
+<pre class="r"><code>tuition_cost %&gt;% 
+  group_by(type) %&gt;% 
+  pivot_longer(c(&quot;out_of_state_total&quot;, &quot;in_state_total&quot;), names_to = &quot;tuition_type&quot;, values_to = &quot;tuition&quot;) %&gt;% 
+  ggplot(aes(x = tuition, y = tuition_type)) +
+  geom_halfeyeh() +
+  scale_x_continuous(labels = scales::dollar_format()) +
+  labs(title = &quot;&quot;)</code></pre>
+<p><img src="/blog/tidy-tuesday-us-tuition-data_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<div id="historical-tuition-data" class="section level2">
+<h2>Historical Tuition Data</h2>
+<p>Another dataset contains the historical tuition values in adjusted US dollars. We can see that private and public tuitions have doubled for four year courses since 1985. It’s quite a lot more expensive to attend college in the US now than it was 35 years ago!</p>
+<pre class="r"><code>tuesdata$historical_tuition %&gt;% 
+  mutate(year = substr(year, 1, 4) %&gt;% as.numeric()) %&gt;% 
+  ggplot(aes(x = year, y = tuition_cost, colour = tuition_type)) +
+  geom_line() +
+  facet_wrap(~type, ncol = 3) +
+  theme_bw() +
+  theme(legend.position = &quot;bottom&quot;) +
+  scale_y_continuous(labels = scales::dollar_format()) +
+  labs(title = &quot;Tuition cost in 2016/17 dollars&quot;)</code></pre>
+<p><img src="/blog/tidy-tuesday-us-tuition-data_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="state-tuition-map" class="section level2">
+<h2>State tuition map</h2>
+<p>The package <a href="https://github.com/UrbanInstitute/urbnmapr">urbnmapr</a> allows us to plot US states and overlay information at a state level.</p>
+<pre class="r"><code>library(urbnmapr)
+
+tuition_cost &lt;- tuesdata$tuition_cost
+
+states_sf &lt;- get_urbn_map(&quot;states&quot;, sf = TRUE)
+
+tuition_by_state &lt;- states_sf %&gt;% 
+  rename(state_code = state_abbv) %&gt;% 
+  inner_join(tuition_cost, by = &quot;state_code&quot;) %&gt;% 
+  filter(degree_length == &quot;4 Year&quot;) %&gt;% 
+  group_by(state_code) %&gt;% 
+  summarise_if(is.numeric, list(~mean(.), ~median(.)))
+
+tuition_by_state %&gt;% 
+  ggplot() +
+  geom_sf(color = &quot;#ffffff&quot;, aes(fill = out_of_state_tuition_median)) +
+  scale_fill_gradient2(labels = scales::dollar_format()) +
+  coord_sf(datum = NA)</code></pre>
+<p><img src="/blog/tidy-tuesday-us-tuition-data_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+</div>
+<div id="most-cost-effective-universities" class="section level2">
+<h2>Most cost effective Universities</h2>
+<p>To quantify the most cost effective university to attend, divide the mid career pay by the total tuition paid for a 4-year degree (bachelors or masters degree).</p>
+<pre class="r"><code>salary &lt;- tuesdata$salary_potential
+
+salary %&gt;% 
+  left_join(tuesdata$tuition_cost %&gt;% filter(degree_length == &quot;4 Year&quot;)) %&gt;% 
+  pivot_longer(c(&quot;out_of_state_total&quot;, &quot;in_state_total&quot;), names_to = &quot;tuition_type&quot;, values_to = &quot;tuition&quot;) %&gt;% 
+  mutate(ratio = mid_career_pay / tuition,
+         name_cost = paste(name, scales::dollar(tuition))) %&gt;%
+  ggplot(aes(x = ratio, y = tuition)) +
+  geom_point() +
+  facet_wrap(~tuition_type, ncol = 1) +
+  scale_y_continuous(labels = scales::dollar_format()) +
+  xlab(&quot;Mid Career Earnings / Tuition Fee&quot;) +
+  ylab(&quot;Tuition&quot;) +
+  labs(title = &quot;Yearly Tuition Costs and Mid Career Earnings&quot;)</code></pre>
+<p><img src="/blog/tidy-tuesday-us-tuition-data_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</div>
+<div id="net-cost-by-income-bracket" class="section level1">
+<h1>Net cost by income bracket</h1>
+<p>Using tidybayes again to view the distribution of the net-costs by income bracket. The data has a peak at zero for those receiveing full scholarships. Interesting they seem most prevelant for those with an income over £110,000!</p>
+<pre class="r"><code>tuesdata$tuition_income %&gt;% 
+  ggplot(aes(y = income_lvl, x = net_cost)) +
+  geom_halfeyeh() +
+  scale_x_continuous(labels = scales::dollar_format()) +
+  labs(title = &quot;Distribution of tuition cost paid by income level&quot;)</code></pre>
+<p><img src="/blog/tidy-tuesday-us-tuition-data_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+</div>
+<div id="diversity-of-top-20-forbes-colleges" class="section level1">
+<h1>Diversity of top 20 Forbes Colleges</h1>
+<p>To create a chart of diversity such as that on the <a href="https://priceonomics.com/ranking-the-most-and-least-diverse-colleges-in/">priceonomics</a> blog I took the top 20 colleges according to Forbes <a href="https://en.wikipedia.org/wiki/Rankings_of_universities_in_the_United_States#Forbes_college_rankings">from wikipedia</a>. I copied the table to an R tribble using <a href="https://cran.r-project.org/web/packages/datapasta/vignettes/how-to-datapasta.html">data pasta</a>.</p>
+<pre class="r"><code>top_unis &lt;- tibble::tribble(
+                              ~name, ~ranking,
+                     &quot;Harvard University&quot;, 1,
+                    &quot;Stanford University&quot;, 2,
+                        &quot;Yale University&quot;, 3,
+  &quot;Massachusetts Institute of Technology&quot;, 4,
+                   &quot;Princeton University&quot;, 5,
+             &quot;University of Pennsylvania&quot;, 6,
+                       &quot;Brown University&quot;, 7,
+     &quot;California Institute of Technology&quot;, 8,
+                        &quot;Duke University&quot;, 9,
+                      &quot;Dartmouth College&quot;, 10,
+                     &quot;Cornell University&quot;, 11,
+                         &quot;Pomona College&quot;, 12,
+     &quot;University of California, Berkeley&quot;, 13,
+                    &quot;Columbia University&quot;, 14,
+                  &quot;Georgetown University&quot;, 15,
+                  &quot;University of Chicago&quot;, 16,
+                &quot;Northwestern University&quot;, 17,
+               &quot;University of Notre Dame&quot;, 18,
+       &quot;Rensselaer Polytechnic Institute&quot;, 19,
+                 &quot;University of Michigan&quot;, 20
+  )</code></pre>
+<p>The <a href="https://en.wikipedia.org/wiki/Herfindahl%E2%80%93Hirschman_Index">Herfindahl-Hirschman index</a> is used as a measure of diversity at each college. The general formula is:</p>
+<p><span class="math display">\[HHI = \sum_{i=1}^Na^2_i\]</span></p>
+<p>Where <span class="math inline">\(a_i\)</span> represents the proportion of the <span class="math inline">\(i^{th}\)</span> race and <span class="math inline">\(N = 5\)</span> consisting of the number of races under consideration: White, Black, Hispanic, Asian and other. So for a completely homogeneous population <span class="math inline">\(a_1 = 1\)</span> and <span class="math inline">\(a_{2:5} = 0\)</span>, hence <span class="math inline">\(HHI = 1^2 + 0^2 + 0^2 + 0^2 + 0^2 = 1\)</span>. The following plot shows the Forbes top 20 univesities ordered by diversity according to the HHI.</p>
+<pre class="r"><code>diversity &lt;- tuesdata$diversity_school
+
+racial_diversity &lt;- diversity %&gt;% 
+  filter(!is.na(name)) %&gt;% 
+  filter(category %in% c(&quot;White&quot;, &quot;Black&quot;, &quot;Hispanic&quot;, &quot;Asian&quot;)) %&gt;% 
+  pivot_wider(names_from = category, values_from = enrollment) %&gt;% 
+  mutate(other = total_enrollment - White - Black - Hispanic - Asian) %&gt;% 
+  pivot_longer(4:8, names_to = &quot;category&quot;, values_to = &quot;enrollment&quot;) %&gt;% 
+  group_by(name) %&gt;% 
+  mutate(hhi = sum((enrollment / total_enrollment) ** 2))
+
+racial_diversity %&gt;% 
+  inner_join(top_unis) %&gt;% 
+  ungroup() %&gt;% 
+  mutate(
+    name_hhi = paste(ranking, name, round(hhi, 2)),
+    name_hhi = forcats::fct_reorder(name_hhi, desc(hhi))) %&gt;% 
+  filter(ranking &lt;= 20) %&gt;% 
+  ggplot() +
+  geom_col(aes(y = name_hhi, x = enrollment, fill = category), position = &quot;fill&quot;)</code></pre>
+<p><img src="/blog/tidy-tuesday-us-tuition-data_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<p>The next plot considers diversity as measured by HHI against potential earnings at mid career. This is the plot I chose to tweet for tidy tuesday.</p>
+<pre class="r"><code>racial_diversity %&gt;%
+  inner_join(salary, by = c(&quot;name&quot;)) %&gt;%
+  distinct(name, hhi, mid_career_pay) %&gt;%
+  ggplot(aes(x = hhi, y = mid_career_pay, colour = name)) +
+  geom_point() +
+  gghighlight(mid_career_pay &gt; 1.55e5 |
+                hhi &gt; 0.9, use_direct_label = TRUE) +
+  scale_y_continuous(labels = scales::dollar_format()) +
+  labs(
+    title = &quot;Expected Pay and Racial Diversity at US Universities&quot;,
+    subtitle = &quot;Racial Diversity is calculated using HHI\nwhich ranges from 0.2 (most diverse) to 1 (least diverse).&quot;) +
+    ylab(&quot;Mid Career Pay&quot;) +
+    xlab(&quot;Herfindahl-Hirschman index&quot;)</code></pre>
+<p><img src="/blog/tidy-tuesday-us-tuition-data_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<pre class="r"><code># ggsave(&quot;diversity.png&quot;)</code></pre>
+</div>
+<div id="tweet" class="section level1">
+<h1>Tweet</h1>
+<p>Now use the <a href="https://rtweet.info/">rtweet</a> library to post the plots directly to Twitter without leaving R. You must connect to the Twitter API using OAuth as described in <a href="https://rtweet.info/articles/auth.html">this vignette</a>, I set the Twitter application keys in my <code>.Renviron</code> file which is never committed to public version control (this can be easily edited using <code>usethis::edit_r_environ()</code>).</p>
+<pre class="r"><code>library(rtweet)
+
+token &lt;- create_token(
+  app = &quot;rstats&quot;,
+  consumer_key = Sys.getenv(&quot;TWITTER_API_KEY&quot;), 
+  consumer_secret = Sys.getenv(&quot;TWITTER_API_SECRET_KEY&quot;),
+  access_token = Sys.getenv(&quot;TWITTER_ACCESS_TOKEN&quot;),
+  access_secret = Sys.getenv(&quot;TWITTER_ACCESS_TOKEN_SECRET&quot;))</code></pre>
+<p>The function <code>post_tweet</code> can be used to post a new tweet.</p>
+<pre class="r"><code>post_tweet(
+  status = &quot;This week&#39;s #TidyTuesday features diversity, tuition costs and expected salaries at US universities. It appears more diverse colleges tend to have higher earning graduates. #rstats&quot;,
+  media = c(&quot;diversity.png&quot;, &quot;carbon.png&quot;),
+  token = token
+)</code></pre>
+</div>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/highlight.min.js"></script>
+
+
+
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/r.min.js"></script>
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/yaml.min.js"></script>
+<script src="//cdn.bootcss.com/highlight.js/9.11.0/languages/scala.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="/js/math-code.js"></script>
+<script async src="//cdn.bootcss.com/mathjax/2.7.1/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+

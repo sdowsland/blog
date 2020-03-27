@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Bayesian on Bayesian Statistics and Functional Programming </title>
+    <link>https://jonnylaw.rocks/categories/bayesian/</link>
+    <description>Recent content in Bayesian on Bayesian Statistics and Functional Programming </description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Fri, 27 Mar 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="https://jonnylaw.rocks/categories/bayesian/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Bayesian Inference for an SIR Model</title>
+      <link>https://jonnylaw.rocks/blog/bayesian-inference-for-an-sir-model/</link>
+      <pubDate>Fri, 27 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/blog/bayesian-inference-for-an-sir-model/</guid>
+      <description>Johns Hopkins University have put together a repository containing confirmed cases of COVID19, deaths and recovered patients. Below we plot the confirmed cases, confirmed recovered and deaths.
+SIR Model The system of ordinary differential equations (ODE) for the Susceptible Infected Recovered (SIR) model is given by
+\[\begin{align} &amp;amp; \frac{dS}{dt} = - \frac{\beta I S}{N}, \\ &amp;amp; \frac{dI}{dt} = \frac{\beta I S}{N}- \gamma I, \\ &amp;amp; \frac{dR}{dt} = \gamma I,\\ &amp;amp; N = S + I + R.</description>
+    </item>
+    
+    <item>
+      <title>Tidy Tuesday: The Office</title>
+      <link>https://jonnylaw.rocks/blog/tidy-tuesday-the-office/</link>
+      <pubDate>Tue, 17 Mar 2020 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/blog/tidy-tuesday-the-office/</guid>
+      <description>First we download the ratings for each office episode using the tidytuesdayR package.
+office &amp;lt;- tidytuesdayR::tt_load(x = 2020, 12) episode_ratings &amp;lt;- office$office_ratings We can use glimpse from the tibble package to see the column types and some example data from the head of the table.
+glimpse(episode_ratings) ## Observations: 188 ## Variables: 6 ## $ season &amp;lt;dbl&amp;gt; 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, … ## $ episode &amp;lt;dbl&amp;gt; 1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, … ## $ title &amp;lt;chr&amp;gt; &amp;quot;Pilot&amp;quot;, &amp;quot;Diversity Day&amp;quot;, &amp;quot;Health Care&amp;quot;, &amp;quot;The Alliance&amp;quot;, … ## $ imdb_rating &amp;lt;dbl&amp;gt; 7.</description>
+    </item>
+    
+    <item>
+      <title>Bayesian Survival Analysis: Exponential Model</title>
+      <link>https://jonnylaw.rocks/blog/bayesian-survival-analysis/</link>
+      <pubDate>Fri, 09 Aug 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/blog/bayesian-survival-analysis/</guid>
+      <description>Poisson Distribution Consider an arbitrary interval where the expected number of events in the interval is denoted as \(\lambda\). The number of events in this interval is Poisson distributed with rate \(\lambda\). To see this, proceed to subdivide the interval into \(n\) smaller intervals \(t_1, \dots, t_n\) in which the probability of an event occurring in each small interval is \(\lambda / n\) and can be represented as an independent Bernoulli trial.</description>
+    </item>
+    
+    <item>
+      <title>Hamiltonian Monte Carlo in R</title>
+      <link>https://jonnylaw.rocks/blog/hamiltonian_monte_carlo_in_r/</link>
+      <pubDate>Wed, 31 Jul 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/blog/hamiltonian_monte_carlo_in_r/</guid>
+      <description>Introduction Determining the posterior distribution for the parameters of a real-world Bayesian model inevitably requires calculating high-dimensional integrals. Often these are tedious or impossible to calculate by hand. Markov chain Monte Carlo (MCMC) algorithms are popular approaches, samplers such as the Gibbs sampler can be used to sample from models with conditionally conjugate specifications and the Metropolis-Hastings algorithm can be used when the conditionally conjugate form is not present.</description>
+    </item>
+    
+    <item>
+      <title>Bayesian Linear Regression with Gibbs Sampling in R</title>
+      <link>https://jonnylaw.rocks/blog/bayesian-linear-regression-gibbs/</link>
+      <pubDate>Fri, 14 Jun 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/blog/bayesian-linear-regression-gibbs/</guid>
+      <description>Linear regression models are commonly used to explain relationships between predictor variables and outcome variables. The data consists of pairs of independent observations \((y_i, x_i)\) where \(y_i \in \mathbb{R}^p\) represents the outcome variable of the \(i^{th}\) observation and \(x_i \in \mathbb{R}^{m \times 1}\) represents the predictor variable of the \(i^{th}\) observation. The specification for this model is:
+\[y_i = \beta^T x_i + \varepsilon_i, \quad \varepsilon_i \sim \mathcal{N}(0, \Sigma).\]
+The parameters of the model include the coefficients of the predictor variables, \(\beta \in \mathbb{R}^{1 \times m}\) and the variance of the unmodelled noise, \(\Sigma \in \mathbb{R}^{p \times p}\).</description>
+    </item>
+    
+    <item>
+      <title>Bayesian Inference using rejection sampling</title>
+      <link>https://jonnylaw.rocks/blog/rejection-sampling/</link>
+      <pubDate>Mon, 25 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/blog/rejection-sampling/</guid>
+      <description>Coin Flip Model As an example, consider a (possibly biased) coin flip experiment. The parameter of interest is the probability of heads \(p_h\). A Beta distribution is chosen for the prior of \(p_h\), \(p(p_h) = \mathcal{B}(\alpha, \beta)\). The Beta distribution has support between 0 and 1, which is appropriate for a probability. The likelihood of a coin flip is Bernoulli, however the coin should be flipped several times in order to learn the parameter \(p_h\).</description>
+    </item>
+    
+    <item>
+      <title>Efficient Markov Chain Monte Carlo in R with Rcpp</title>
+      <link>https://jonnylaw.rocks/blog/efficient_mcmc_using_rcpp/</link>
+      <pubDate>Mon, 11 Feb 2019 00:00:00 +0000</pubDate>
+      
+      <guid>https://jonnylaw.rocks/blog/efficient_mcmc_using_rcpp/</guid>
+      <description>Bivariate Normal Model This post considers how to implement a simple Metropolis scheme to determine the parameter posterior distribution of a bivariate Normal distribution. The implementation is generic, using higher-order-functions and hence can be re-used with new algorithms by specifying the un-normalised log-posterior density and a proposal distribution for the parameters. The built-in parallel package is used fit multiple chains in parallel, finally the Metropolis algorithm is reimplemented in C++ using Rcpp which seemlessly integrates with R.</description>
+    </item>
+    
+  </channel>
+</rss>
